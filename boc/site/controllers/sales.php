@@ -1,10 +1,10 @@
 <?php
 if (! defined ( 'BASEPATH' ))
 	exit ( 'No direct script access allowed' );
-class Act extends MY_Controller {
+class Sales extends MY_Controller {
 	
 	public $post;
-	protected $table = 'act';
+	protected $table = 'Sales';
 	protected $interest_table = 'interest';
 	protected $upload_table = 'upload';
 	protected $compress_width_height = 1000;//图片压缩宽高
@@ -38,23 +38,23 @@ class Act extends MY_Controller {
 		$this->load->helpers('uisite_helper');
         //加载model
         $this->load->model('appuser_model','appuser');
-        $this->load->model('act_model','appuser');
+        $this->load->model('sales_model','appuser');
         //load_AES
         $this->load->library('AES');
 	}
-	//发布活动
-	public function releaseActivity(){
+	//发布促销
+	public function releaseSales(){
 		
 		$data = $this->post;
 		$userid=isset($data['userid'])?$data ['userid']:'';//用户id
-		$title=isset($data['title'])?$data['title']:'';//活动标题
+		$title=isset($data['title'])?$data['title']:'';//促销标题
 		$dead_line=isset($data['dead_line'])?$data['dead_line']:'';//报名截至时间
-		$start_time=isset($data['start_time'])?$data['start_time']:'';//活动开始时间
-		$end_time=isset($data['end_time'])?$data['end_time']:'';//活动结束时间
+		$start_time=isset($data['start_time'])?$data['start_time']:'';//促销开始时间
+		$end_time=isset($data['end_time'])?$data['end_time']:'';//促销结束时间
 		$phone=isset($data['phone'])?$data['phone']:'';//联系电话
 		$content=isset($data['content'])?$data['content']:'';//描述
 		$video=isset($data['video'])?$data['video']:'';//视频地址
-		$interest=isset($data['interest'])?$data['interest']:'';//活动类型
+		$interest=isset($data['interest'])?$data['interest']:'';//促销类型
 		//报名费用
 		$online_pay=isset($data['online_pay'])?$data['online_pay']:'';//是否在线支付
 		$refund=isset($data['refund'])?$data['refund']:'';//支持退款
@@ -69,19 +69,19 @@ class Act extends MY_Controller {
 		$now_time=time();
 		
 		//检查userid
-// 		$vdata=$this->appuser->check_user($userid,$this->content['token']);
-// 		if ($vdata['status']==-1){
-// 			$output=array ('msg'=>$vdata['msg'],'returnCode'=>-401,'data'=>null);
-// 			exit(json_encode($output));
-// 		}
+		// 		$vdata=$this->appuser->check_user($userid,$this->content['token']);
+		// 		if ($vdata['status']==-1){
+		// 			$output=array ('msg'=>$vdata['msg'],'returnCode'=>-401,'data'=>null);
+		// 			exit(json_encode($output));
+		// 		}
 		
 		if(empty($title)){
-			$output=array ('msg'=>'请填写活动主题','returnCode'=>-401,'data'=>null);
+			$output=array ('msg'=>'请填写促销主题','returnCode'=>-401,'data'=>null);
 			exit(json_encode($output));
 		}
 		$title_len=mb_strlen($title);
 		if($title_len<8||$title_len>20){
-			$output=array ('msg'=>'请填写8-20个字符的活动主题','returnCode'=>-401,'data'=>null);
+			$output=array ('msg'=>'请填写8-20个字符的促销主题','returnCode'=>-401,'data'=>null);
 			exit(json_encode($output));
 		}
 		$photo=array();
@@ -112,14 +112,14 @@ class Act extends MY_Controller {
 			}
 						if(!$photoCount){
 							$output = array(
-									'msg' => '请上传活动首图',
+									'msg' => '请上传促销首图',
 									'return_code' => -401
 							);
 							exit(json_encode($output));
 						}
 						if($photoCount>3){
 							$output = array(
-									'msg' => '最多上传3张活动首图',
+									'msg' => '最多上传3张促销首图',
 									'return_code' => -401
 							);
 							exit(json_encode($output));
@@ -142,7 +142,7 @@ class Act extends MY_Controller {
 		}
 				else{
 					$output = array(
-							'msg' => '请上传活动首图',
+							'msg' => '请上传促销首图',
 							'return_code' => -401
 					);
 					exit(json_encode($output));
@@ -175,19 +175,19 @@ class Act extends MY_Controller {
 			exit(json_encode($output));
 		}
 		if(empty($start_time)){
-			$output=array ('msg'=>'请填写活动开始时间','returnCode'=>-401,'data'=>null);
+			$output=array ('msg'=>'请填写促销开始时间','returnCode'=>-401,'data'=>null);
 			exit(json_encode($output));
 		}
 		if($start_time < $dead_line){
-			$output=array ('msg'=>'活动开始时间不能早于报名截至时间','returnCode'=>-401,'data'=>null);
+			$output=array ('msg'=>'促销开始时间不能早于报名截至时间','returnCode'=>-401,'data'=>null);
 			exit(json_encode($output));
 		}
 		if(empty($end_time)){
-			$output=array ('msg'=>'请填写活动结束时间','returnCode'=>-401,'data'=>null);
+			$output=array ('msg'=>'请填写促销结束时间','returnCode'=>-401,'data'=>null);
 			exit(json_encode($output));
 		}
 		if($end_time < $start_time){
-			$output=array ('msg'=>'活动结束时间不能早于活动开始时间','returnCode'=>-401,'data'=>null);
+			$output=array ('msg'=>'促销结束时间不能早于促销开始时间','returnCode'=>-401,'data'=>null);
 			exit(json_encode($output));
 		}
 		if(empty($phone)){
@@ -199,29 +199,25 @@ class Act extends MY_Controller {
 			exit(json_encode($output));
 		}
 		if(empty($place)||empty($lal)){
-			$output=array ('msg'=>'请填写活动举办地点','returnCode'=>-401,'data'=>null);
+			$output=array ('msg'=>'请填写促销举办地点','returnCode'=>-401,'data'=>null);
 			exit(json_encode($output));
 		}
 		if(empty($content)){
-			$output=array ('msg'=>'请填写活动详细描述','returnCode'=>-401,'data'=>null);
+			$output=array ('msg'=>'请填写促销详细描述','returnCode'=>-401,'data'=>null);
 			exit(json_encode($output));
 		}
 		$content_len=mb_strlen($content);
 		if($content_len<8||$content_len>1000){
-			$output=array ('msg'=>'请填写8-1000个字符的活动详细描述','returnCode'=>-401,'data'=>null);
+			$output=array ('msg'=>'请填写8-1000个字符的促销详细描述','returnCode'=>-401,'data'=>null);
 			exit(json_encode($output));
 		}
 		if(empty($interest)){
-			$output=array ('msg'=>'请选择活动类型','returnCode'=>-401,'data'=>null);
+			$output=array ('msg'=>'请选择促销类型','returnCode'=>-401,'data'=>null);
 			exit(json_encode($output));
 		}
 		$where=array('id'=>$interest);
 		if(!$this->appuser->countSql($where,$this->interest_table)){
-			$output=array ('msg'=>'活动类型不正确','returnCode'=>-401,'data'=>null);
-			exit(json_encode($output));
-		}
-		if($agree != 1){
-			$output=array ('msg'=>'请同意《出来吧发布协议》','returnCode'=>-401,'data'=>null);
+			$output=array ('msg'=>'促销类型不正确','returnCode'=>-401,'data'=>null);
 			exit(json_encode($output));
 		}
 		//

@@ -66,6 +66,7 @@ define('MININTERVAL',60);// 发送短信验证码间隔
 define('EXPIRE',8600);//短信验证码有效期
 define('SMS_ACCOUNT','shiyuan_yilianwang');//短信接口帐号
 define('SMS_PASSWORD','Yilianwang666');//短信接口密码
+
 /*
  * 开发模式
  * 配置项目运行的环境，该配置会影响错误报告的显示和配置文件的读取。
